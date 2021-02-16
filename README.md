@@ -5,5 +5,5 @@
 
 ## Databázový model
 
-![N|Solid](image/database%20pic.PNG)
+![N|Solid](image/database.PNG)
 
