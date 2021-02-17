@@ -3,15 +3,11 @@
   - https://documenter.getpostman.com/view/9427677/TWDTLyXr
   - https://documenter.getpostman.com/view/9427677/TWDTLyXs
 
-
-
 ## Databázový model
 
 Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
 
 ![N|Solid](image/database.png)
-
-
 
 ## JPA Entity třídy
 
@@ -85,8 +81,6 @@ Tato entita je podobná “book“ ale má jednu metodu navíc a jiné atributy.
 
 Pro přidání nové knihy je potřeba manuálně aktualizovat bookList s relevantním autorem. Proto je tam funkce “addBook“. Stejně to uděláme pro entitu “author“.
 
-
-
 ## Vytvoření Repositories a přístup k datům z databáze
 
 Zde používám implementaci JpaRepository interface pro vytvořené modely. Proto se musí vytvořit Interface pro všechny vytvořené modely.
@@ -109,11 +103,92 @@ public interface PublisherRepository extends JpaRepository<Publisher, Integer> {
 
 JPA Interface obsahuje meotdy save(), findById(), deleteById() atd.
 
-
 ## Vytvoření Servisní třídy
 
 Zde se nadefinují všechny funkce, které bude používat RestController. Všechny Controllery mají CRUD funkci, která je nadefinovaná v BeanMapping, kde se vytváří servisní třídy.
 
 ![N|Solid](image/ServiceLayer.png)
+
+```sh
+public interface BeanMapping<T> {
+    Page<T> getAll(Pageable pageable);
+    T add(T o);
+    T update(T o, int id);
+    T getById(int id);
+    T deleteById(int id);
+}
+```
+```sh
+public abstract class AuthorService implements BeanMapping<Author> {
+    public abstract List<Book> getBookById(int id);
+}
+```
+```sh
+public abstract class BookService implements BeanMapping<Book> {
+}
+
+```
+```sh
+public abstract class PublisherService implements BeanMapping<Publisher> {
+    public abstract List<Book> getBookById(int id);
+}
+```
+
+Děděním “AuthorService“ pomocí extends nadefinujeme všechny naše metody. Je tady ještě vytvořená metoda “checkIfIdIsPresentandReturnAuthor“, která kontroluje jestli v databázi existuje hledané “id“. Jestli existuje tak se nám vrátí nějaký záznam jinak vyskčí exception. v příkladu je anotace “@Autowired“, která nám injektuje AuthorRepository objekt do service třídy. 
+
+```sh
+@Service
+@SuppressWarnings("unchecked")
+@NoArgsConstructor
+public class AuthorServiceImpl extends AuthorService {
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Override
+    public Page<Author> getAll(Pageable pageable) {
+        return authorRepository.findAll(pageable);
+    }
+
+    @Override
+    public Author add(Author o) {
+        return authorRepository.save(o);
+    }
+
+    @Override
+    public Author update(Author o, int id) {
+        Author author = checkIfIdIsPresentandReturnAuthor(id);
+        author.setName(author.getName());
+        author.setAddress(author.getAddress());
+        return authorRepository.save(author);
+    }
+
+    @Override
+    public Author getById(int id) {
+        return checkIfIdIsPresentandReturnAuthor(id);
+    }
+
+    @Override
+    public Author deleteById(int id) {
+        Author author = checkIfIdIsPresentandReturnAuthor(id);
+        authorRepository.deleteById(id);
+        return author;
+    }
+
+
+    private Author checkIfIdIsPresentandReturnAuthor( int id )
+    {
+        if ( !authorRepository.findById( id ).isPresent() )
+            throw new ResourceNotFoundException( " Author id = " + id + " not found" );
+        else
+            return authorRepository.findById( id ).get();
+    }
+
+    @Override
+    public List<Book> getBookById(int id) {
+        return checkIfIdIsPresentandReturnAuthor(id).getBookList();
+    }
+}
+```
 
 
