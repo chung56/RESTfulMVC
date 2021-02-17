@@ -3,11 +3,13 @@
   - https://documenter.getpostman.com/view/9427677/TWDTLyXr
   - https://documenter.getpostman.com/view/9427677/TWDTLyXs
 
+
 ## Databázový model
 
 Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
 
 ![N|Solid](image/database.png)
+
 
 ## JPA Entity třídy
 
@@ -81,6 +83,7 @@ Tato entita je podobná “book“ ale má jednu metodu navíc a jiné atributy.
 
 Pro přidání nové knihy je potřeba manuálně aktualizovat bookList s relevantním autorem. Proto je tam funkce “addBook“. Stejně to uděláme pro entitu “author“.
 
+
 ## Vytvoření Repositories a přístup k datům z databáze
 
 Zde používám implementaci JpaRepository interface pro vytvořené modely. Proto se musí vytvořit Interface pro všechny vytvořené modely.
@@ -103,7 +106,11 @@ public interface PublisherRepository extends JpaRepository<Publisher, Integer> {
 
 JPA Interface obsahuje meotdy save(), findById(), deleteById() atd.
 
+
 ## Vytvoření Servisní třídy
 
+Zde se nadefinují všechny funkce, které bude používat RestController. Všechny Controllery mají CRUD funkci, která je nadefinovaná v BeanMapping, kde se vytváří servisní třídy.
 
-Before we move to the Controller we need to define the Service Layer. In here we are defining all our functions which are using in Rest controllers. As all the controllers having basic functions like; create, update, add, get functions, it is defined in Interface MainService and from that created Service classes.
+![N|Solid](image/ServiceLayer.png)
+
+
