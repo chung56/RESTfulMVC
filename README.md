@@ -4,11 +4,13 @@
   - https://documenter.getpostman.com/view/9427677/TWDTLyXs
 
 
+
 ## Databázový model
 
 Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
 
 ![N|Solid](image/database.png)
+
 
 
 ## JPA Entity třídy
@@ -82,6 +84,7 @@ public class Publisher implements Serializable {
 Tato entita je podobná “book“ ale má jednu metodu navíc a jiné atributy. Zde se ukládá List knih, které jsou vydávány stejným publisherem. 1 publisher může mít několik knih “@OneToMany“  relace s knihami. Aby byl publisher bidiretional použijeme “mappedBy = "publisher" “ a  “usedCascadeType.ALL“. Když bude publisher smazán, tak se smaže kniha, která patřila publisherovi.
 
 Pro přidání nové knihy je potřeba manuálně aktualizovat bookList s relevantním autorem. Proto je tam funkce “addBook“. Stejně to uděláme pro entitu “author“.
+
 
 
 ## Vytvoření Repositories a přístup k datům z databáze
