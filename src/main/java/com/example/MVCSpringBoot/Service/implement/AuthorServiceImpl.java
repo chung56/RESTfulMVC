@@ -4,7 +4,6 @@ import com.example.MVCSpringBoot.Exceptions.ResourceNotFoundException;
 import com.example.MVCSpringBoot.Model.Author;
 import com.example.MVCSpringBoot.Model.Book;
 import com.example.MVCSpringBoot.Repository.AuthorRepository;
-import com.example.MVCSpringBoot.Service.AuthorService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@SuppressWarnings("unchecked")
 @NoArgsConstructor
 public class AuthorServiceImpl extends AuthorService {
 
@@ -59,7 +57,6 @@ public class AuthorServiceImpl extends AuthorService {
         else
             return authorRepository.findById( id ).get();
     }
-
 
     @Override
     public List<Book> getBookById(int id) {

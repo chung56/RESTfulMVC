@@ -4,7 +4,7 @@ import com.example.MVCSpringBoot.Exceptions.ResourceNotFoundException;
 import com.example.MVCSpringBoot.HttpStatus.ResponseWrapper;
 import com.example.MVCSpringBoot.Model.Book;
 import com.example.MVCSpringBoot.Model.Publisher;
-import com.example.MVCSpringBoot.Service.PublisherService;
+import com.example.MVCSpringBoot.Service.implement.PublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

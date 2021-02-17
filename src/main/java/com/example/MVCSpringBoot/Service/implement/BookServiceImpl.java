@@ -7,7 +7,6 @@ import com.example.MVCSpringBoot.Model.Publisher;
 import com.example.MVCSpringBoot.Repository.AuthorRepository;
 import com.example.MVCSpringBoot.Repository.BookRepository;
 import com.example.MVCSpringBoot.Repository.PublisherRepository;
-import com.example.MVCSpringBoot.Service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

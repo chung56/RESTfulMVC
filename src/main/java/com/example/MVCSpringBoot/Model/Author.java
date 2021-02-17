@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "author")
-public class Author implements Serializable {
+public class Author{
 
     @Id
     @Column(name = "author_id")

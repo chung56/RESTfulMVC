@@ -2,7 +2,7 @@ package com.example.MVCSpringBoot.Controller;
 
 import com.example.MVCSpringBoot.HttpStatus.ResponseWrapper;
 import com.example.MVCSpringBoot.Model.Book;
-import com.example.MVCSpringBoot.Service.BookService;
+import com.example.MVCSpringBoot.Service.implement.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -4,7 +4,6 @@ import com.example.MVCSpringBoot.Exceptions.ResourceNotFoundException;
 import com.example.MVCSpringBoot.Model.Book;
 import com.example.MVCSpringBoot.Model.Publisher;
 import com.example.MVCSpringBoot.Repository.PublisherRepository;
-import com.example.MVCSpringBoot.Service.PublisherService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@SuppressWarnings("unchecked")
 @NoArgsConstructor
 public class PublisherServiceImpl extends PublisherService {
 

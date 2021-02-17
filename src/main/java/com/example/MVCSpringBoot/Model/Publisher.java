@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "publisher")
-public class Publisher implements Serializable {
+public class Publisher {
 
     @Id
     @Column(name = "publisher_id")
@@ -38,5 +37,4 @@ public class Publisher implements Serializable {
     public void addBook(Book book){
         this.bookList.add(book);
     }
-
 }
