@@ -35,41 +35,40 @@ public class Author implements Serializable {
     @JsonIgnore
     private List<Book> bookList = new ArrayList<>();
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public List<Book> getBookList() {
-        return bookList;
-    }
-
-    public void setBookList(List<Book> bookList) {
-        this.bookList = bookList;
-    }
-
     public void addBook(Book book )
     {
         this.bookList.add( book );
     }
 
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
+//
+//    public List<Book> getBookList() {
+//        return bookList;
+//    }
+//
+//    public void setBookList(List<Book> bookList) {
+//        this.bookList = bookList;
+//    }
 }
