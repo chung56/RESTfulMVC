@@ -7,7 +7,7 @@
 
 Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
 
-![N|Solid](image/database.png)
+![N|Center](image/database.png)
 
 ## JPA Entity třídy
 
