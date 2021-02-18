@@ -107,7 +107,7 @@ JPA Interface obsahuje meotdy save(), findById(), deleteById() atd.
 
 Zde se nadefinují všechny funkce, které bude používat RestController. Všechny Controllery mají CRUD funkci, která je nadefinovaná v BeanMapping, kde se vytváří servisní třídy.
 
-![N|Center](image/ServiceLayer.png)
+![N|Solid](image/ServiceLayer.png)
 
 ```sh
 public interface BeanMapping<T> {
@@ -191,4 +191,163 @@ public class AuthorServiceImpl extends AuthorService {
 }
 ```
 
+Anotací @Service spring boot identifikuje jako servisní třídu. V “BookService“ může klient přidat a nebo vytvořit nového autora/publishera. Jestli klient pošle id autora/publishera na server tak by se mu měl vrátit relevantní objekt a přidá se do listu. Podobně to provedeme pro UPDATE a další funkce.
+
+```sh
+    @Override
+    public Book add( Book o )
+    {
+        //if author n publisher gets an id we can search the db and assign them
+        if ( o.getAuthor().getId() != 0 )
+        {
+            Author author = checkIfIdIsPresentandReturnAuthor( o.getAuthor().getId() );
+            o.setAuthor( author );
+            author.addBook( o );
+        }
+        if ( o.getPublisher().getId() != 0 )
+        {
+            Publisher publisher = checkIfIdIsPresentandReturnPublisher( o.getPublisher().getId() );
+            o.setPublisher( publisher );
+            publisher.addBook( o );
+        }
+
+        return bookRepository.save( o );
+    }
+```
+
+## Vytvoření vlastního Response Wrapper
+
+Server by měl být schopen poslat požadovanou response na základě dat, které mu příjdou.
+
+```sh
+{
+ “status”: HTTP_STATUS,
+ “timestamp”: SERVER_TIME,
+ “data”: OBJECTS
+}
+```
+Zde je potřeba vytvořit ResponseWrapper, který bude dědit “ResponseEntity<T>“. Prvně musím nadefinovat model, který bude ukládat JSON data. Jestli-že <T> data bude null nebo list instancí bude prázdný, vyskočí nám exception.
+
+```sh
+@Data
+public class ResultSet<T> {
+
+    private HttpStatus status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    private LocalDateTime timestamp;
+    private T data;
+
+    private ResultSet()
+    {
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public ResultSet( T o, HttpStatus status ) throws ResourceNotFoundException
+    {
+        this();
+        if ( o == null || ( o instanceof List && ( ( List ) o ).isEmpty() ) )
+            throw new ResourceNotFoundException( "No Content Found" );
+        this.status = status;
+        this.data = o;
+    }
+}
+```
+
+Potom můžeme nadefinovat ResponseWrapper níže.
+
+```sh
+public class ResponseWrapper<T> extends ResponseEntity<T> {
+
+    public ResponseWrapper( T t, HttpStatus status )
+    {
+        super( ( T ) new ResultSet<>( t, status ), status );
+    }
+}
+```
+
+## Vytvoření REST kontroleru
+
+Zde potřebujeme vytvořit REST endpointy a namapovat je do Controlleru. Uvedeme si příklad pro autora. 
+
+```sh
+GET     api/author/             - get all records with pagination
+POST    api/author/             - add a new record
+GET     api/author/{ID}         - get author by ID
+PATCH   api/author/{ID}         - update author by ID
+DELETE  api/author/{ID}         - delete author by ID
+GET     api/author/{ID}/books   - get all books of author by ID
+```
+
+Níže nadefinujeme kontroler pro Autora
+
+```sh
+@Validated
+@RestController
+@RequestMapping("api/author")
+public class AuthorController {
+
+    @Autowired
+    AuthorService authorService;
+
+    @GetMapping(value = "/{id}")
+    public ResponseWrapper<Author> getAuthorById(
+            @Valid @Pattern(regexp = REGEX_FOR_NUMBERS, message = MESSAGE_FOR_REGEX_NUMBER_MISMATCH) @PathVariable(value = "id") String id )
+    {
+        return new ResponseWrapper<>( authorService.getById( Integer.parseInt( id ) ), HttpStatus.OK );
+    }
+
+    @GetMapping()
+    public ResponseWrapper<Page<Author>> getAuthorAll(Pageable pageable )
+    {
+        return new ResponseWrapper<>( authorService.getAll( pageable ), HttpStatus.OK );
+    }
+
+    @PostMapping
+    public ResponseWrapper<Author> createAuthor( @Valid @RequestBody Author author )
+    {
+        return new ResponseWrapper<>( authorService.add( author ), HttpStatus.OK );
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseWrapper<Author> deleteAuthor(
+            @Valid @Pattern(regexp = REGEX_FOR_NUMBERS, message = MESSAGE_FOR_REGEX_NUMBER_MISMATCH) @PathVariable(value = "id") String id )
+    {
+        return new ResponseWrapper<>( authorService.deleteById( Integer.parseInt( id ) ), HttpStatus.OK );
+    }
+
+    @PatchMapping(value = "/{id}")
+    public ResponseWrapper<Author> UpdateAuthor( @Valid @RequestBody Author author,
+                                                 @Valid @Pattern(regexp = REGEX_FOR_NUMBERS, message = MESSAGE_FOR_REGEX_NUMBER_MISMATCH) @PathVariable(value = "id") String id )
+    {
+        return new ResponseWrapper<>( authorService.update( author, Integer.parseInt( id ) ), HttpStatus.OK );
+    }
+
+    @GetMapping(value = "/{id}/books")
+    public ResponseWrapper<List<Book>> getAuthorBooksById(
+            @Valid @Pattern(regexp = REGEX_FOR_NUMBERS, message = MESSAGE_FOR_REGEX_NUMBER_MISMATCH) @PathVariable(value = "id") String id )
+    {
+        return new ResponseWrapper<>( authorService.getBookById( Integer.parseInt( id ) ), HttpStatus.OK );
+    }
+}
+```
+
+Anotací “@RestController“ nastavíme třídu jako kontroler. A použitím “@RequestMapping“ nastavíme endpointy. GET pro “@GetMapping“, POST pro “@PostMapping“ atd. Použití Pageable pro GET metodu můžeme získat všechny autory následujícím způsobem:
+
+```sh
+/api/author?size=5&page=0 
+```
+
+## Exception Handling 
+
+
+API error handling is done to give the client what went wrong in a meaningful manner. In spring boot, it sends exceptions with a lot of useless information about the error. To give it a meaningful context we need to handle the exceptions. You can read more from here [10]. This is our error JSON model
+
+```sh
+{
+ “status”: “BAD_REQUEST”,
+ “timestamp”: “29–03–2019 02:52:52”,
+ “message”: “No Content Found”,
+ “debugMessage”: “No Content Found”
+}
+```
 
