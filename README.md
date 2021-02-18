@@ -339,8 +339,7 @@ Anotací “@RestController“ nastavíme třídu jako kontroler. A použitím �
 
 ## Exception Handling 
 
-
-API error handling is done to give the client what went wrong in a meaningful manner. In spring boot, it sends exceptions with a lot of useless information about the error. To give it a meaningful context we need to handle the exceptions. You can read more from here [10]. This is our error JSON model
+Exceptinony nás upozorňují na chyby ke které došlo během programu. Ve spring bootu nám vyskočí spoustu neužitečných hlášek/informací o chybě. Proto si vytvoříme vlastní kontext pro naše exceptiony. Níže je uveden náš error JSON model.
 
 ```sh
 {
@@ -350,4 +349,7 @@ API error handling is done to give the client what went wrong in a meaningful ma
  “debugMessage”: “No Content Found”
 }
 ```
+
+K použití vlastní exceptiony potřebujeme vytvořit ExceptionHandler. Exception class a Model class se namapuji do JSON modelu.
+![N|Solid](image/exception%20handling.png)
 
