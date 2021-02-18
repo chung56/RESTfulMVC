@@ -5,7 +5,7 @@
 
 ## Databázový model
 
-Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
+Představme si jednoduchý scénář, kde máme autora, knížku a publisher. Autor a publisher mají relaci one-to-many s knížkami.
 
 ![N|Solid](image/database.png)
 
@@ -48,7 +48,7 @@ Nejsou zde žádné Gettery a Settery. Vše je nastaveno pomocí pluginu “Lomb
 
 Použitím ”@Entity” nadefinujeme třídu jako Entity class, která bude brát data z tabulky “book“ pomocí “@Table“ anotace. Id je tady nastaven jako primární klíč pomocí “@Id“ a automaticky si generuje id pomocí “@GeneratedValue“.
 
-V Entitě “book“ může mít každý “publisher“ a “author“ více knížek, proto “book“ má relaci Many-to-One s těmito entitami. Je nastavená pomocí “@ManyToOne“ a foreign key je nadefinován v “@JoinColumn“. Zde jsem použil “Cascade.PERSIST“ pro Many-to-One relaci. To znamená, že když přidám knížku s novým autorem a publisherem, následně vymažu knížku tak autor a vydavatel mi zůstane uložený v databázi.
+V Entitě “book“ může mít každý “publisher“ a “author“ více knížek, proto “book“ má relaci Many-to-One s těmito entitami. Je nastavená pomocí “@ManyToOne“ a foreign key je nadefinován v “@JoinColumn“. Zde jsem použil “Cascade.PERSIST“ pro Many-to-One relaci. To znamená, že když přidám knížku s novým autorem a publisherem, následně vymažu knížku tak autor a publisher mi zůstane uložený v databázi.
 
 ```sh
 @Data
