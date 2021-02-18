@@ -355,7 +355,7 @@ Níže je uveden jak spring boot pracuje s exceptiony. Pokaždé, když Service 
 
 ![N|Solid](image/exception%20handling.png)
 
-Zde je potřeba nadefinovat třídu exception handler. Použitím následujících anotací pri tuto třídu: “@ExceptionHandler“ je vstupní bod pro použití exceptiony v kontrolerech. 
+Zde je potřeba nadefinovat třídu exception handler. Použitím následujících anotací pro tuto třídu: “@ExceptionHandler“ je vstupní bod pro použití exceptiony v kontrolerech. 
 Pomocí anotace “@ControllerAdvice“ můžeme používat ExceptionHandler globálně ve všech modulech.
 
 ```sh
@@ -437,7 +437,8 @@ Pokud se pošle špatný content body, tak by se o chybovou hlášku postará �
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
                                                                   HttpHeaders headers, 
-                                                                  HttpStatus status,                                                                                               WebRequest request )
+                                                                  HttpStatus status,
+                                                                  WebRequest request )
     {
         ApiError apiError = createError( MESSAGE_FOR_INVALID_BODY_ERROR, HttpStatus.BAD_REQUEST, e );
         return new ResponseEntity<>( apiError, apiError.getHttpStatus() );
