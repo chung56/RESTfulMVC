@@ -7,7 +7,7 @@
 
 Představme si jednoduchý scénář, kde máme autora, knížku a vydavatele. Autor a vydavatel mají relaci one-to-many s knížkami.
 
-![N|Center](image/database.png)
+![N|Solid](image/database.png)
 
 ## JPA Entity třídy
 
@@ -107,7 +107,7 @@ JPA Interface obsahuje meotdy save(), findById(), deleteById() atd.
 
 Zde se nadefinují všechny funkce, které bude používat RestController. Všechny Controllery mají CRUD funkci, která je nadefinovaná v BeanMapping, kde se vytváří servisní třídy.
 
-![N|Solid](image/ServiceLayer.png)
+![N|Center](image/ServiceLayer.png)
 
 ```sh
 public interface BeanMapping<T> {
