@@ -351,5 +351,126 @@ Exceptinony nás upozorňují na chyby ke které došlo během programu. Ve spri
 ```
 
 K použití vlastní exceptiony potřebujeme vytvořit ExceptionHandler. Exception class a Model class se namapuji do JSON modelu.
+Níže je uveden jak spring boot pracuje s exceptiony. Pokaždé, když Service vyhodí exception, tak ho RestExceptionHandler zachytí a chyba se zobrazí klientovi.
+
 ![N|Solid](image/exception%20handling.png)
 
+Zde je potřeba nadefinovat třídu exception handler. Použitím následujících anotací pri tuto třídu: “@ExceptionHandler“ je vstupní bod pro použití exceptiony v kontrolerech. 
+Pomocí anotace “@ControllerAdvice“ můžeme používat ExceptionHandler globálně ve všech modulech.
+
+```sh
+@ControllerAdvice
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> resourceEntityNotFound( ResourceNotFoundException ex )
+    {
+        ApiError apiError = createError( ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST, ex );
+        return new ResponseEntity<>( apiError, apiError.getHttpStatus() );
+    }
+
+    private ApiError createError( String msg, HttpStatus status, Exception e )
+    {
+        ApiError apiError = new ApiError( status );
+        apiError.setMessage( msg );
+        apiError.setDebugMessage( e.getMessage() );
+        return apiError;
+    }
+}
+```
+
+```sh
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException{
+
+    public ResourceNotFoundException( String exception )
+    {
+        super( exception );
+    }
+}
+```
+
+Třída “ResourceNotFoundException“ dědí z “RuntimeException“. Zde můžeme hodit “ResourceNotFoundException“ do relevantních metod a zachytit je pomocí anotace “@ExceptionHandler“ a zpracovat ji v “resourceEntityNotFound“ metodě.
+
+## Controller Validation
+
+představme si, že klient zadá špatný vstup. Obvykle nám spring boot vrátí prázdné tělo (response body) bez jakékoliv zprávy. Proto si musíme vytvořit vlástní chybovou hlášku.
+
+```sh
+    @GetMapping(value = "/{id}")
+    public ResponseWrapper<Author> getAuthorById(
+            @Valid @Pattern(regexp = REGEX_FOR_NUMBERS, message = MESSAGE_FOR_REGEX_NUMBER_MISMATCH)                         @PathVariable(value = "id") String id )
+    {
+        return new ResponseWrapper<>( authorService.getById( Integer.parseInt( id ) ), HttpStatus.OK );
+    }
+```
+
+Pokud není číslo tak spring vyhodí “ConstrainViolationException“ exception, kterou zachytáváme ve třídě “RestExceptionHandler“.
+
+```sh
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleConstraintViolationException( ConstraintViolationException e )
+    {
+        ApiError apiError = createError( MESSAGE_FOR_INVALID_PARAMETERS_ERROR, HttpStatus.BAD_REQUEST, e );
+        return new ResponseEntity<>( apiError, apiError.getHttpStatus() );
+    }
+```
+
+Pokud klient zadá GET request “api/author/djdh22“, tak kontroler exception handler vyhodí následující chybovou hlášku zpět klientovi.
+
+```sh
+{
+ “status”: “BAD_REQUEST”,
+ “timestamp”: “31–03–2019 09:58:08”,
+ “message”: “Invalid Parameters”,
+ “debugMessage”: “getAuthorById.id: ID should contains integers only”,
+ “path”: null
+}
+```
+
+Pokud klient zadá POST request autora s nějakým tělem (content body), potřebujeme zkontrolovat jestli byl poslán ve správném tvaru. Proto zde použijeme anotaci “@valid“.
+Pokud se pošle špatný content body, tak by se o chybovou hlášku postará “ResponseEntityExceptionHandler“ a metoda “handleMethodArgumentNotValid“.
+
+```sh
+    @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
+                                                                  HttpHeaders headers, 
+                                                                  HttpStatus status,                                                                                               WebRequest request )
+    {
+        ApiError apiError = createError( MESSAGE_FOR_INVALID_BODY_ERROR, HttpStatus.BAD_REQUEST, e );
+        return new ResponseEntity<>( apiError, apiError.getHttpStatus() );
+    }
+```
+
+Níže je ukázka chybové hlášky pokud se na POST request pošle špatný content body 
+
+```sh
+{
+ “status”: “BAD_REQUEST”,
+ “timestamp”: “01–04–2019 12:25:00”,
+ “message”: “Invalid Method Body. Check JSON Objects”,
+ “debugMessage”: “Validation failed for argument [0] in public me.namila.RESTSpringTest.Results.ResponseWrapper<me.namila.RESTSpringTest.Model.Author> ........ “,
+ “path”: null
+}
+```
+
+## Application properties
+
+v application properties si nastavíme připojení na databázi 
+
+```sh
+## Database setting
+spring.datasource.url=jdbc:postgresql://localhost:5432/book-store
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+
+## JPA configuration
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL9Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.generate-ddl=true
+spring.jpa.show-sql=true
+```
+
+Zde jsem nadefinovat “spring.jpa.hibernet.ddl-auto=update“. Pokaždé kdy aplikace poběží tak se nám udělá update aktuální databáze. Je zde možnost použít create, create-drop.
