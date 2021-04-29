@@ -3,7 +3,7 @@
   - https://documenter.getpostman.com/view/9427677/TWDTLyXr
   - https://documenter.getpostman.com/view/9427677/TWDTLyXs
 
-
+pozn: nefunguje book asi chyba v kodu a nebo spatne navrazena databaze
 
 ## Databázový model
 

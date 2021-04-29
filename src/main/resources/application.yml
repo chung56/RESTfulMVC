@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/book-store
+    username: postgres
+    password: postgres
+
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
